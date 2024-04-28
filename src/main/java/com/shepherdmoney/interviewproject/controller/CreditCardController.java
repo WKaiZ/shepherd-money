@@ -36,10 +36,17 @@ public class CreditCardController {
             return new ResponseEntity<>(payload.getUserId(), HttpStatus.BAD_REQUEST);
         }
 
+        if (payload.getCardIssuanceBank().isBlank()) {
+            return new ResponseEntity<>(payload.getUserId(), HttpStatus.BAD_REQUEST);
+        }
         CreditCard creditCard = new CreditCard();
         creditCard.setUser(user.get());
         creditCard.setNumber(payload.getCardNumber());
+        creditCard.setIssuanceBank(payload.getCardIssuanceBank());
+        creditCard.setBalanceHistories(new ArrayList<>());
         creditCardRepository.save(creditCard);
+
+        user.orElseThrow().getCreditCards().add(creditCard);
 
         return new ResponseEntity<>(creditCard.getId(), HttpStatus.OK);
 
@@ -61,7 +68,10 @@ public class CreditCardController {
     @GetMapping("/credit-card:user-id")
     public ResponseEntity<Integer> getUserIdForCreditCard(@RequestParam String creditCardNumber) {
         Optional<CreditCard> creditCard = creditCardRepository.findByNumber(creditCardNumber);
-
+        User user = creditCard.orElseThrow().getUser();
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return creditCard.map(card -> new ResponseEntity<>(card.getUser().getId(), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 

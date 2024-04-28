@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
@@ -28,5 +29,6 @@ public class CreditCard {
     private User user;
 
     @OneToMany(mappedBy = "creditCard", cascade = CascadeType.ALL)
+    @OrderBy("date")
     private List<BalanceHistory> balanceHistories;
 }
