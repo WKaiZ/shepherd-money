@@ -26,7 +26,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
-    implementation 'org.projectlombok:lombok:1.18.30'
 
     // https://mvnrepository.com/artifact/com.h2database/h2
     implementation group: 'com.h2database', name: 'h2', version: '2.1.214'

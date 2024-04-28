@@ -24,20 +24,24 @@ public class UserController {
         if (name == null || name.isBlank() || email == null || email.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
+
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setCreditCards(new HashSet<>());
         userRepository.save(user);
+
         return ResponseEntity.ok(user.getId());
     }
 
     @DeleteMapping("/user")
     public ResponseEntity<String> deleteUser(@RequestParam int userId) {
         Optional<User> user = userRepository.findById(userId);
+
         if (user.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
+
         userRepository.delete(user.get());
         return ResponseEntity.ok("User deleted");
     }

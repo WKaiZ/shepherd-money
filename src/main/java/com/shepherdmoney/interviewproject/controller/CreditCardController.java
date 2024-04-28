@@ -39,17 +39,18 @@ public class CreditCardController {
         if (payload.getCardIssuanceBank().isBlank()) {
             return new ResponseEntity<>(payload.getUserId(), HttpStatus.BAD_REQUEST);
         }
+
         CreditCard creditCard = new CreditCard();
         creditCard.setUser(user.get());
         creditCard.setNumber(payload.getCardNumber());
         creditCard.setIssuanceBank(payload.getCardIssuanceBank());
         creditCard.setBalanceHistories(new ArrayList<>());
-        creditCardRepository.save(creditCard);
 
         user.orElseThrow().getCreditCards().add(creditCard);
 
-        return new ResponseEntity<>(creditCard.getId(), HttpStatus.OK);
+        creditCardRepository.save(creditCard);
 
+        return new ResponseEntity<>(creditCard.getId(), HttpStatus.OK);
     }
 
     @GetMapping("/credit-card:all")
@@ -69,20 +70,25 @@ public class CreditCardController {
     public ResponseEntity<Integer> getUserIdForCreditCard(@RequestParam String creditCardNumber) {
         Optional<CreditCard> creditCard = creditCardRepository.findByNumber(creditCardNumber);
         User user = creditCard.orElseThrow().getUser();
+
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
         return creditCard.map(card -> new ResponseEntity<>(card.getUser().getId(), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
     @PostMapping("/credit-card:update-balance")
     public ResponseEntity<Void> postMethodName(@RequestBody UpdateBalancePayload[] payload) {
         Arrays.sort(payload, Comparator.comparing(UpdateBalancePayload::getBalanceDate));
+
         for (UpdateBalancePayload updateBalancePayload : payload) {
             Optional<CreditCard> creditCard = creditCardRepository.findByNumber(updateBalancePayload.getCreditCardNumber());
+
             if (creditCard.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
+
             CreditCard card = creditCard.get();
             List<BalanceHistory> balanceHistories = card.getBalanceHistories();
             Optional<BalanceHistory> balanceHistory = balanceHistories.stream().filter(history -> history.getDate().equals(updateBalancePayload.getBalanceDate())).findFirst();
